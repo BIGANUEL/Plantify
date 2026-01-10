@@ -1,0 +1,52 @@
+name: plantify
+description: A plant care reminder and tracking application.
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State management & storage
+  shared_preferences: ^2.2.3
+  
+  # UI
+  cupertino_icons: ^1.0.8
+  flutter_svg: ^2.0.9
+  
+  # Clean Architecture dependencies
+  equatable: ^2.0.5
+  intl: ^0.19.0
+  flutter_bloc: ^8.1.6
+  get_it: ^7.7.0
+  http: ^1.2.2
+  
+  # Authentication
+  google_sign_in: ^6.2.1
+  
+  # Image handling
+  image_picker: ^1.0.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - assets/images/
+    - assets/icons/
+  
+  # Uncomment if you want to use custom fonts
+  # fonts:
+  #   - family: Inter
+  #     fonts:
+  #       - asset: fonts/Inter-Regular.ttf
+  #       - asset: fonts/Inter-Bold.ttf
+  #         weight: 700
