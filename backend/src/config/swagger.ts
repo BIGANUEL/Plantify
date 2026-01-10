@@ -179,9 +179,10 @@ export const swaggerSpec = swaggerJsdoc(options);
 // Debug: Log the generated spec to help troubleshoot
 if (env.nodeEnv === 'development') {
   console.log('([LOG swagger_debug] ========= Swagger spec paths:', options.apis);
-  console.log('([LOG swagger_debug] ========= Swagger paths count:', Object.keys(swaggerSpec.paths || {}).length);
-  if (swaggerSpec.paths) {
-    console.log('([LOG swagger_debug] ========= Available paths:', Object.keys(swaggerSpec.paths));
+  const spec = swaggerSpec as { paths?: Record<string, unknown> };
+  console.log('([LOG swagger_debug] ========= Swagger paths count:', Object.keys(spec.paths || {}).length);
+  if (spec.paths) {
+    console.log('([LOG swagger_debug] ========= Available paths:', Object.keys(spec.paths));
   }
 }
 
