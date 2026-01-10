@@ -1,5 +1,27 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 import { env } from './env';
+import path from 'path';
+
+// Get the base URL from environment or use default
+const getBaseUrl = (): string => {
+  if (process.env.BASE_URL) {
+    return process.env.BASE_URL;
+  }
+  if (env.nodeEnv === 'production') {
+    // Try to get from common deployment platforms
+    if (process.env.RENDER_EXTERNAL_URL) {
+      return process.env.RENDER_EXTERNAL_URL;
+    }
+    if (process.env.HEROKU_APP_NAME) {
+      return `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`;
+    }
+    // Default production URL - update this with your actual URL
+    return 'https://your-app-name.onrender.com';
+  }
+  return `http://localhost:${env.port}`;
+};
+
+const baseUrl = getBaseUrl();
 
 const options: swaggerJsdoc.Options = {
   definition: {
@@ -14,12 +36,8 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: `http://localhost:${env.port}`,
-        description: 'Development server',
-      },
-      {
-        url: 'https://your-app-name.onrender.com',
-        description: 'Production server',
+        url: baseUrl,
+        description: env.nodeEnv === 'production' ? 'Production server' : 'Development server',
       },
     ],
     components: {
@@ -148,8 +166,22 @@ const options: swaggerJsdoc.Options = {
       },
     ],
   },
-  apis: ['./src/routes/*.ts'],
+  apis: [
+    // Scan TypeScript source files (for development)
+    path.join(__dirname, '../routes/**/*.ts'),
+    // Scan compiled JavaScript files (for production)
+    path.join(__dirname, '../routes/**/*.js'),
+  ],
 };
 
 export const swaggerSpec = swaggerJsdoc(options);
+
+// Debug: Log the generated spec to help troubleshoot
+if (env.nodeEnv === 'development') {
+  console.log('([LOG swagger_debug] ========= Swagger spec paths:', options.apis);
+  console.log('([LOG swagger_debug] ========= Swagger paths count:', Object.keys(swaggerSpec.paths || {}).length);
+  if (swaggerSpec.paths) {
+    console.log('([LOG swagger_debug] ========= Available paths:', Object.keys(swaggerSpec.paths));
+  }
+}
 

@@ -29,6 +29,8 @@ RUN npm ci --only=production
 
 # Copy built files from builder
 COPY --from=builder /app/dist ./dist
+# Copy source files for Swagger documentation (swagger-jsdoc needs .ts files)
+COPY --from=builder /app/src ./src
 
 # Expose port
 EXPOSE 5000
