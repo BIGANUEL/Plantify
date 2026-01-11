@@ -17,8 +17,29 @@ app.use(helmet());
 // CORS configuration
 app.use(
   cors({
-    origin: env.corsOrigin,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, Postman, or Swagger UI from same domain)
+      if (!origin) {
+        return callback(null, true);
+      }
+      
+      // Allow Swagger UI requests from the same domain
+      const allowedOrigins = [
+        env.corsOrigin,
+        // Add the current server URL for Swagger UI
+        process.env.BASE_URL,
+        process.env.RENDER_EXTERNAL_URL,
+      ].filter(Boolean);
+      
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(null, true); // Allow all origins for now - restrict in production if needed
+      }
+    },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
 
@@ -56,6 +77,11 @@ app.get('/health', (_req, res) => {
 // Swagger documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   customSiteTitle: 'Plantify API Documentation',
+  swaggerOptions: {
+    persistAuthorization: true,
+    tryItOutEnabled: true,
+  },
+  customCss: '.swagger-ui .topbar { display: none }',
 }));
 
 // API routes

@@ -21,7 +21,18 @@ const getBaseUrl = (): string => {
   return `http://localhost:${env.port}`;
 };
 
-const baseUrl = getBaseUrl();
+// Use relative URL for Swagger to work from any domain
+// This allows Swagger UI to make requests to the same server it's hosted on
+const getSwaggerServerUrl = (): string => {
+  // In production, use the actual server URL
+  if (env.nodeEnv === 'production') {
+    return getBaseUrl();
+  }
+  // In development, use localhost
+  return `http://localhost:${env.port}`;
+};
+
+const baseUrl = getSwaggerServerUrl();
 
 const options: swaggerJsdoc.Options = {
   definition: {
@@ -36,8 +47,12 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: baseUrl,
+        url: '/', // Use relative URL so Swagger works from any domain
         description: env.nodeEnv === 'production' ? 'Production server' : 'Development server',
+      },
+      {
+        url: baseUrl, // Also include absolute URL as fallback
+        description: 'Absolute URL',
       },
     ],
     components: {
