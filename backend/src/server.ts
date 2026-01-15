@@ -9,7 +9,8 @@ const startServer = async (): Promise<void> => {
 
     // Start server
     const port = env.port;
-    app.listen(port, () => {
+    // Bind to 0.0.0.0 to allow connections from all network interfaces
+    app.listen(port, '0.0.0.0', () => {
       console.log(`([LOG server_start] ========= Server running on port ${port} in ${env.nodeEnv} mode)`);
     });
   } catch (error) {

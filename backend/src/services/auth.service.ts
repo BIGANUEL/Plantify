@@ -58,8 +58,9 @@ export class AuthService {
     accessToken: string;
     refreshToken: string;
   }> {
-    // Find user
-    const user = await User.findOne({ email });
+    // Find user - ensure email is lowercase for lookup (matches User model's lowercase: true)
+    const normalizedEmail = email.toLowerCase().trim();
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user || !user.password) {
       throw new Error('Invalid credentials');
     }

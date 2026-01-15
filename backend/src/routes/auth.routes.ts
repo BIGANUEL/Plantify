@@ -11,13 +11,15 @@ import {
 } from '../controllers/auth.controller';
 import { authenticate } from '../middleware/auth.middleware';
 import rateLimit from 'express-rate-limit';
+import { env } from '../config/env';
 
 const router = Router();
 
 // Rate limiting for auth endpoints
+// More lenient in development, stricter in production
 const authRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 requests per window
+  max: env.nodeEnv === 'production' ? 30 : 50, // 30 requests in production (for testing), 50 in development
   message: {
     success: false,
     error: {
@@ -25,6 +27,8 @@ const authRateLimiter = rateLimit({
       code: 'RATE_LIMIT_EXCEEDED',
     },
   },
+  // Skip rate limiting entirely in development if needed (uncomment below)
+  // skip: () => env.nodeEnv === 'development',
 });
 
 /**
