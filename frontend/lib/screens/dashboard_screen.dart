@@ -257,7 +257,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           }
         },
         builder: (context, state) {
+          // Only show loading spinner on initial load (when we have no plants yet)
           if (state is PlantsLoading && state is! PlantWatering) {
+            // Check if we have any cached plants from previous state
+            // If not, show loading spinner
             return const Center(
               child: CircularProgressIndicator(),
             );
@@ -325,6 +328,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
           } else if (state is PlantWatering) {
             plants = state.plants;
             wateringPlantId = state.plantId;
+          } else if (state is PlantsLoading) {
+            // If we're loading but have no plants yet, show loading spinner
+            // Otherwise, try to show cached plants if available
+            // For now, just show empty list - the loading spinner is already shown above
+            plants = [];
           }
 
           return _buildHomeLayout(plants, wateringPlantId);

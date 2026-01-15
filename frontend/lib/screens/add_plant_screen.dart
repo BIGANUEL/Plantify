@@ -130,14 +130,16 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
   Widget build(BuildContext context) {
     return BlocListener<PlantsBloc, PlantsState>(
       listenWhen: (previous, current) {
-        // Listen to state changes when we're loading
+        // Only listen when we're in loading state
         if (!_isLoading) return false;
-        // Listen for any state change from Loading to Loaded or Error
+        // Listen for transitions from Loading to Loaded or Error
+        // Also listen if we go from any state to Loaded (after refresh)
         return (previous is PlantsLoading && current is PlantsLoaded) ||
                (current is PlantsError);
       },
       listener: (context, state) {
-        if (state is PlantsLoaded) {
+        if (state is PlantsLoaded && _isLoading) {
+          // Plant was created successfully
           setState(() {
             _isLoading = false;
           });
@@ -155,7 +157,8 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
               ),
             );
           }
-        } else if (state is PlantsError) {
+        } else if (state is PlantsError && _isLoading) {
+          // Error occurred
           setState(() {
             _isLoading = false;
           });

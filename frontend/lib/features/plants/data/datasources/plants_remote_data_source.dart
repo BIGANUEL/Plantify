@@ -279,9 +279,13 @@ class PlantsRemoteDataSourceImpl implements PlantsRemoteDataSource {
         if (responseData['success'] == true && responseData['data'] != null) {
           final plantData = responseData['data']['plant'] ?? responseData['data'];
           if (plantData != null) {
-            return PlantModel.fromJson(plantData);
+            try {
+              return PlantModel.fromJson(plantData);
+            } catch (e) {
+              throw ServerException('Failed to parse plant data: ${e.toString()}');
+            }
           } else {
-            throw ServerException('Plant data not found in response');
+            throw ServerException('Plant data not found in response. Response: ${response.body}');
           }
         } else {
           final errorMsg = responseData['error']?['message'] ?? 'Invalid response format from server';

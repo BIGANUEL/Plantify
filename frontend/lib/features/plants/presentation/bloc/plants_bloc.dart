@@ -93,7 +93,8 @@ class PlantsBloc extends Bloc<PlantsEvent, PlantsState> {
     PlantCreated event,
     Emitter<PlantsState> emit,
   ) async {
-    // Emit loading state to indicate plant creation is in progress
+    // Always emit loading first to ensure state change is detected
+    // This allows the add plant screen listener to detect the transition
     emit(const PlantsLoading());
 
     final result = await createPlantUseCase(
