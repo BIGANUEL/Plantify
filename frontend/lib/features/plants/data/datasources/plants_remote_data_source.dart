@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/errors/exceptions.dart';
@@ -91,14 +90,14 @@ class PlantsRemoteDataSourceImpl implements PlantsRemoteDataSource {
 
   String get _baseUrl {
     if (AppConstants.baseUrl.endsWith('/')) {
-      return '${AppConstants.baseUrl}${AppConstants.apiVersion}';
+      return '${AppConstants.baseUrl.substring(0, AppConstants.baseUrl.length - 1)}${AppConstants.apiPrefix}';
     } else {
-      return '${AppConstants.baseUrl}/${AppConstants.apiVersion}';
+      return '${AppConstants.baseUrl}${AppConstants.apiPrefix}';
     }
   }
 
   Future<Map<String, String>> _getHeaders() async {
-    final token = sharedPreferences.getString('plantify_token');
+    final token = sharedPreferences.getString(AppConstants.userTokenKey);
     final headers = <String, String>{
       'Content-Type': 'application/json',
       'Accept': 'application/json',
@@ -130,8 +129,14 @@ class PlantsRemoteDataSourceImpl implements PlantsRemoteDataSource {
           );
 
       if (response.statusCode == 200) {
-        final List<dynamic> jsonData = json.decode(response.body);
-        return jsonData.map((json) => PlantModel.fromJson(json)).toList();
+        final responseData = json.decode(response.body);
+        // Backend returns: { success: true, data: { plants: [...] } }
+        if (responseData['success'] == true && responseData['data'] != null) {
+          final List<dynamic> plantsData = responseData['data']['plants'] ?? [];
+          return plantsData.map((plantJson) => PlantModel.fromJson(plantJson)).toList();
+        } else {
+          throw ServerException('Invalid response format from server');
+        }
       } else if (response.statusCode == 401 || response.statusCode == 403) {
         throw const ServerException('Unauthorized. Please login again.');
       } else if (response.statusCode >= 500) {
@@ -203,8 +208,14 @@ class PlantsRemoteDataSourceImpl implements PlantsRemoteDataSource {
           );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final jsonData = json.decode(response.body);
-        return PlantModel.fromJson(jsonData);
+        final responseData = json.decode(response.body);
+        // Backend returns: { success: true, data: { plant: {...} } }
+        if (responseData['success'] == true && responseData['data'] != null) {
+          final plantData = responseData['data']['plant'] ?? responseData['data'];
+          return PlantModel.fromJson(plantData);
+        } else {
+          throw ServerException('Invalid response format from server');
+        }
       } else if (response.statusCode == 401 || response.statusCode == 403) {
         throw const ServerException('Unauthorized. Please login again.');
       } else if (response.statusCode == 404) {
@@ -255,7 +266,7 @@ class PlantsRemoteDataSourceImpl implements PlantsRemoteDataSource {
             body: json.encode({
               'name': name,
               'type': type,
-              'nextWateringDate': DateFormat('yyyy-MM-dd').format(nextWateringDate),
+              'wateringFrequency': 7, // Default to 7 days, can be calculated from nextWateringDate
             }),
           )
           .timeout(
@@ -263,8 +274,19 @@ class PlantsRemoteDataSourceImpl implements PlantsRemoteDataSource {
           );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final jsonData = json.decode(response.body);
-        return PlantModel.fromJson(jsonData);
+        final responseData = json.decode(response.body);
+        // Backend returns: { success: true, data: { plant: {...} } }
+        if (responseData['success'] == true && responseData['data'] != null) {
+          final plantData = responseData['data']['plant'] ?? responseData['data'];
+          if (plantData != null) {
+            return PlantModel.fromJson(plantData);
+          } else {
+            throw ServerException('Plant data not found in response');
+          }
+        } else {
+          final errorMsg = responseData['error']?['message'] ?? 'Invalid response format from server';
+          throw ServerException(errorMsg);
+        }
       } else if (response.statusCode == 401 || response.statusCode == 403) {
         throw const ServerException('Unauthorized. Please login again.');
       } else if (response.statusCode == 400) {
@@ -346,8 +368,14 @@ class PlantsRemoteDataSourceImpl implements PlantsRemoteDataSource {
           );
 
       if (response.statusCode == 200) {
-        final jsonData = json.decode(response.body);
-        return PlantModel.fromJson(jsonData);
+        final responseData = json.decode(response.body);
+        // Backend returns: { success: true, data: { plant: {...} } }
+        if (responseData['success'] == true && responseData['data'] != null) {
+          final plantData = responseData['data']['plant'] ?? responseData['data'];
+          return PlantModel.fromJson(plantData);
+        } else {
+          throw ServerException('Invalid response format from server');
+        }
       } else if (response.statusCode == 401 || response.statusCode == 403) {
         throw const ServerException('Unauthorized. Please login again.');
       } else if (response.statusCode == 404) {

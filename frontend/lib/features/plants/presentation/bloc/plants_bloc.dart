@@ -93,13 +93,8 @@ class PlantsBloc extends Bloc<PlantsEvent, PlantsState> {
     PlantCreated event,
     Emitter<PlantsState> emit,
   ) async {
-    final currentState = state;
-    if (currentState is PlantsLoaded) {
-      // Keep current plants visible while creating
-      emit(PlantsLoaded(currentState.plants));
-    } else {
-      emit(const PlantsLoading());
-    }
+    // Emit loading state to indicate plant creation is in progress
+    emit(const PlantsLoading());
 
     final result = await createPlantUseCase(
       CreatePlantParams(
