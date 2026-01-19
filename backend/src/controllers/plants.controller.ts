@@ -32,6 +32,8 @@ export const getPlants = async (req: AuthRequest, res: Response, next: NextFunct
           lastWatered: plant.lastWatered,
           nextWatering: plant.nextWatering,
           imageUrl: plant.imageUrl,
+          light: plant.light,
+          humidity: plant.humidity,
           createdAt: plant.createdAt,
           updatedAt: plant.updatedAt,
         })),
@@ -81,6 +83,8 @@ export const getPlantById = async (req: AuthRequest, res: Response, next: NextFu
           lastWatered: plant.lastWatered,
           nextWatering: plant.nextWatering,
           imageUrl: plant.imageUrl,
+          light: plant.light,
+          humidity: plant.humidity,
           createdAt: plant.createdAt,
           updatedAt: plant.updatedAt,
         },
@@ -119,6 +123,8 @@ export const createPlant = async (req: AuthRequest, res: Response, next: NextFun
           lastWatered: plant.lastWatered,
           nextWatering: plant.nextWatering,
           imageUrl: plant.imageUrl,
+          light: plant.light,
+          humidity: plant.humidity,
           createdAt: plant.createdAt,
           updatedAt: plant.updatedAt,
         },
@@ -170,6 +176,8 @@ export const updatePlant = async (req: AuthRequest, res: Response, next: NextFun
           lastWatered: plant.lastWatered,
           nextWatering: plant.nextWatering,
           imageUrl: plant.imageUrl,
+          light: plant.light,
+          humidity: plant.humidity,
           createdAt: plant.createdAt,
           updatedAt: plant.updatedAt,
         },
@@ -230,7 +238,24 @@ export const waterPlant = async (req: AuthRequest, res: Response, next: NextFunc
     }
 
     const { id } = req.params;
-    const plant = await plantsService.waterPlant(id, req.user.userId);
+    // Extract lastWatered timestamp from request body if provided
+    let lastWatered: Date | undefined;
+    if (req.body?.lastWatered) {
+      lastWatered = new Date(req.body.lastWatered);
+      // Validate that the date is valid
+      if (isNaN(lastWatered.getTime())) {
+        res.status(400).json({
+          success: false,
+          error: {
+            message: 'Invalid lastWatered timestamp format',
+            code: 'BAD_REQUEST',
+          },
+        });
+        return;
+      }
+    }
+    
+    const plant = await plantsService.waterPlant(id, req.user.userId, lastWatered);
 
     if (!plant) {
       res.status(404).json({
@@ -249,8 +274,16 @@ export const waterPlant = async (req: AuthRequest, res: Response, next: NextFunc
         plant: {
           id: plant._id.toString(),
           name: plant.name,
+          type: plant.type,
+          careInstructions: plant.careInstructions,
+          wateringFrequency: plant.wateringFrequency,
           lastWatered: plant.lastWatered,
           nextWatering: plant.nextWatering,
+          imageUrl: plant.imageUrl,
+          light: plant.light,
+          humidity: plant.humidity,
+          createdAt: plant.createdAt,
+          updatedAt: plant.updatedAt,
         },
       },
     });

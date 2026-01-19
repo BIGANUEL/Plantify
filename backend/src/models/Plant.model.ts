@@ -9,6 +9,8 @@ export interface IPlant extends Document {
   lastWatered?: Date;
   nextWatering?: Date;
   imageUrl?: string;
+  light?: string;
+  humidity?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -46,6 +48,14 @@ const PlantSchema = new Schema<IPlant>(
       type: Date,
     },
     imageUrl: {
+      type: String,
+      trim: true,
+    },
+    light: {
+      type: String,
+      trim: true,
+    },
+    humidity: {
       type: String,
       trim: true,
     },
