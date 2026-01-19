@@ -26,7 +26,20 @@ export class PlantsService {
       careInstructions: plantData.careInstructions,
       wateringFrequency: plantData.wateringFrequency || 7,
       imageUrl: plantData.imageUrl,
+      light: plantData.light,
+      humidity: plantData.humidity,
     });
+
+    // If nextWatering is provided, set it directly
+    // Otherwise, calculate it from lastWatered + wateringFrequency if lastWatered exists
+    if (plantData.nextWatering) {
+      plant.nextWatering = new Date(plantData.nextWatering);
+    } else {
+      // For new plants without lastWatered, set nextWatering to now + wateringFrequency
+      const nextWateringDate = new Date();
+      nextWateringDate.setDate(nextWateringDate.getDate() + (plantData.wateringFrequency || 7));
+      plant.nextWatering = nextWateringDate;
+    }
 
     await plant.save();
     return plant;
@@ -55,6 +68,8 @@ export class PlantsService {
       plant.wateringFrequency = plantData.wateringFrequency;
     }
     if (plantData.imageUrl !== undefined) plant.imageUrl = plantData.imageUrl;
+    if (plantData.light !== undefined) plant.light = plantData.light;
+    if (plantData.humidity !== undefined) plant.humidity = plantData.humidity;
 
     await plant.save();
     return plant;
@@ -69,7 +84,7 @@ export class PlantsService {
     return result.deletedCount > 0;
   }
 
-  async waterPlant(plantId: string, userId: string): Promise<IPlant | null> {
+  async waterPlant(plantId: string, userId: string, lastWatered?: Date): Promise<IPlant | null> {
     const plant = await Plant.findOne({
       _id: new mongoose.Types.ObjectId(plantId),
       userId: new mongoose.Types.ObjectId(userId),
@@ -79,8 +94,9 @@ export class PlantsService {
       return null;
     }
 
-    plant.lastWatered = new Date();
-    // nextWatering will be calculated by the pre-save hook
+    // Use provided timestamp (from user click) if available, otherwise use current server time
+    plant.lastWatered = lastWatered || new Date();
+    // nextWatering will be calculated by the pre-save hook based on lastWatered
     await plant.save();
 
     return plant;

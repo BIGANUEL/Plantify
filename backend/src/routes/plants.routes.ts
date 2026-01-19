@@ -166,6 +166,7 @@ router.post(
     body('careInstructions').optional().trim(),
     body('wateringFrequency').optional().isInt({ min: 1 }).withMessage('Watering frequency must be a positive number'),
     body('imageUrl').optional().isURL().withMessage('Image URL must be a valid URL'),
+    body('nextWatering').optional().isISO8601().withMessage('Next watering date must be a valid ISO 8601 date'),
   ],
   validateRequest,
   createPlant as any
