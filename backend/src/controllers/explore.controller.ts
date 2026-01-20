@@ -160,7 +160,7 @@ export const getProblemById = async (req: Request, res: Response, next: NextFunc
 /**
  * Seed explore data (admin endpoint - can be called once to populate database)
  */
-export const seedExploreData = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const seedExploreData = async (_: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     await exploreService.seedExplorePlants();
     await exploreService.seedProblems();
