@@ -27,7 +27,6 @@ class PlantifyApp extends StatefulWidget {
   State<PlantifyApp> createState() => _PlantifyAppState();
 }
 
-// Global dark mode notifier
 final darkModeNotifier = DarkModeNotifier();
 
 class _PlantifyAppState extends State<PlantifyApp> {
@@ -35,7 +34,6 @@ class _PlantifyAppState extends State<PlantifyApp> {
   void initState() {
     super.initState();
     _loadDarkModePreference();
-    // Listen to dark mode changes
     darkModeNotifier.addListener(_onDarkModeChanged);
   }
 

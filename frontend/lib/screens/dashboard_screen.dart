@@ -49,9 +49,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     _loadDarkModePreference();
-    // Listen to dark mode changes
     darkModeNotifier.addListener(_onDarkModeChanged);
-    // Load plants when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<PlantsBloc>().add(const LoadPlants());
       _fetchWeather();
@@ -105,7 +103,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (mounted) {
         setState(() {
           _isLoadingWeather = false;
-          // On error, keep default values (24°C, 65%)
         });
       }
     }
@@ -226,16 +223,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       body: IndexedStack(
         index: _currentIndex,
         children: [
-          // Home Tab
           _buildHomeTab(),
-          // Explore Tab
           BlocProvider(
             create: (_) => di.sl<ExploreBloc>(),
             child: const ExploreScreen(),
           ),
-          // Reminders Tab
           const RemindersScreen(),
-          // Profile Tab
           ProfileScreen(
             email: widget.email,
             onLogout: widget.onLogout,
@@ -390,12 +383,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             );
           }
-          // Load watered status when plants are loaded
           if (state is PlantsLoaded) {
             print('([DASHBOARD] Listener received PlantsLoaded, loading watered status)');
             final currentCount = state.plants.length;
             if (_previousPlantCount != null && _previousPlantCount! > currentCount) {
-              // Plant was deleted
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: const Row(
@@ -418,20 +409,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
           }
         },
         builder: (context, state) {
-          // Get plants from state
           List<Plant> plants = [];
           String? wateringPlantId;
 
           if (state is PlantsLoaded) {
             print('([DASHBOARD] Builder received PlantsLoaded with ${state.plants.length} plants)');
             plants = state.plants;
-            // Watered status is loaded in the listener
           } else if (state is PlantWatering) {
             plants = state.plants;
             wateringPlantId = state.plantId;
           } else if (state is PlantsLoading) {
-            // If loading and we have no plants, show loading spinner
-            // Otherwise show the layout (plants will be empty but UI won't freeze)
             if (plants.isEmpty) {
               return const Center(
                 child: CircularProgressIndicator(),
@@ -514,7 +501,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           userName = authState.user.name;
         }
         
-        // Use username if available, otherwise extract from email, otherwise use 'User'
         final displayName = userName?.isNotEmpty == true
             ? userName![0].toUpperCase() + userName.substring(1)
             : widget.email.split('@').first.isNotEmpty
@@ -529,7 +515,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           color: AppColors.primaryGreen,
           child: CustomScrollView(
         slivers: [
-          // Beautiful Gradient Header with greeting
           SliverToBoxAdapter(
             child: PlantifyHeader(
               title: '$greeting, $displayName!',
@@ -609,9 +594,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                         ),
                       );
-                      // The BLoC will automatically emit PlantsLoaded after plant creation
-                      // The BlocListener will handle the UI refresh
-                      // No need for manual refresh here
                     },
                   ),
                 ),
@@ -625,7 +607,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Weather Info Card with gradient
                   PlantifyCard(
                     gradientColors: AppColors.primaryGradient,
                     padding: const EdgeInsets.all(20),
@@ -718,8 +699,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ],
                     ),
                   ),
-                  
-                  // Action Buttons
+
                   Row(
                     children: [
                       Expanded(
@@ -731,7 +711,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               : AppColors.waterTeal,
                           onPressed: plants.isNotEmpty
                               ? () {
-                                  // Water the first plant that needs water, or show dialog
                                   final plantNeedingWater = plants.firstWhere(
                                     (p) {
                                       final now = DateTime.now();
@@ -767,9 +746,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ],
                   ),
                   
-                  const SizedBox(height: 24),
-                  
-                  // My Plants Section
+                  const SizedBox(height: 24                  ),
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -799,9 +777,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ],
                   ),
                   
-                  const SizedBox(height: 12),
-                  
-                  // Plants Grid
+                  const SizedBox(height: 12                  ),
+
                   if (plants.isEmpty)
                     Center(
                       child: Padding(
@@ -844,7 +821,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     )
                   else if (!_showAllPlants)
-                    // Show only 4 plants in grid layout
                     GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
@@ -861,7 +837,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       },
                     )
                   else
-                    // Show all plants in scrollable grid layout
                     SizedBox(
                       height: MediaQuery.of(context).size.height * 0.6, // Fixed height that works
                       child: Scrollbar(
@@ -909,7 +884,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final isOverdue = wateringDate.isBefore(today) || wateringDate.isAtSameMomentAs(today);
     final difference = plant.nextWateringDate.difference(now).inDays;
 
-    // Check if plant was watered today
     final isWateredToday = _wateredTodayStatus[plant.id] ?? false;
     
     Color statusColor;
@@ -917,7 +891,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     List<Color> gradientColors;
     
     if (isWateredToday) {
-      statusColor = const Color(0xFF2196F3); // Blue for watered
+      statusColor = const Color(0xFF2196F3);
       statusText = 'Watered today';
       gradientColors = AppColors.oceanGradient;
     } else if (isOverdue) {
@@ -937,7 +911,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       gradientColors = AppColors.primaryGradient;
     }
 
-    // Create gradient background based on status
     final cardGradient = [
       gradientColors.first.withValues(alpha: 0.08),
       gradientColors.last.withValues(alpha: 0.03),
@@ -954,7 +927,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
         ).then((_) {
-          // Refresh plants when returning from detail screen
           context.read<PlantsBloc>().add(const LoadPlants());
         });
       },
@@ -966,7 +938,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Plant Image Placeholder with gradient
               Expanded(
                 child: Container(
                   width: double.infinity,
@@ -1041,7 +1012,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ],
           ),
-          // Delete button in top-right corner
           Positioned(
             top: 8,
             right: 8,
@@ -1071,7 +1041,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _showDeleteConfirmation(BuildContext context, Plant plant) {
-    // Capture the bloc instance before showing the dialog
     final plantsBloc = context.read<PlantsBloc>();
     
     showDialog(
@@ -1124,7 +1093,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           TextButton(
             onPressed: () {
               Navigator.of(dialogContext).pop();
-              // Use the captured bloc instance instead of reading from context
               plantsBloc.add(PlantDeleted(plantId: plant.id));
             },
             child: const Text(

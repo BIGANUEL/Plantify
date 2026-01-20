@@ -16,14 +16,12 @@ class SimpleLineGraph extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (dataPoints.isEmpty) {
-      // Generate sample data if empty
       return _buildGraph(context, _generateSampleData());
     }
     return _buildGraph(context, dataPoints);
   }
 
   List<double> _generateSampleData() {
-    // Generate sample data between 60-70
     return List.generate(30, (index) => 60 + (index % 11) * 0.9);
   }
 
@@ -48,7 +46,6 @@ class SimpleLineGraph extends StatelessWidget {
         ),
         child: Column(
           children: [
-            // Y-axis labels
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -90,7 +87,6 @@ class SimpleLineGraph extends StatelessWidget {
               ],
             ),
             const Spacer(),
-            // X-axis labels
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -180,7 +176,6 @@ class _LineGraphPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 0.5;
 
-    // Draw grid lines
     for (int i = 0; i <= 4; i++) {
       final y = (size.height - 40) * (i / 4) + 20;
       canvas.drawLine(
@@ -190,7 +185,6 @@ class _LineGraphPainter extends CustomPainter {
       );
     }
 
-    // Draw data line
     final path = Path();
     final width = size.width;
     final height = size.height - 40; // Account for labels

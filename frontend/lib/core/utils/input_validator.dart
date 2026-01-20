@@ -23,7 +23,6 @@ class InputValidator {
   /// Validates phone number (basic validation)
   static bool isValidPhoneNumber(String phone) {
     if (phone.isEmpty) return false;
-    // Remove all non-digit characters
     final digitsOnly = phone.replaceAll(RegExp(r'[^\d]'), '');
     return digitsOnly.length >= 10 && digitsOnly.length <= 15;
   }

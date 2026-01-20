@@ -23,7 +23,6 @@ class PlantifyCircularProgress extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Background circle (dashed)
           CustomPaint(
             size: Size(size, size),
             painter: _DashedCirclePainter(
@@ -31,7 +30,6 @@ class PlantifyCircularProgress extends StatelessWidget {
               strokeWidth: strokeWidth,
             ),
           ),
-          // Progress arc
           SizedBox(
             width: size,
             height: size,
@@ -42,7 +40,6 @@ class PlantifyCircularProgress extends StatelessWidget {
               valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
             ),
           ),
-          // Label text
           if (label != null)
             Text(
               label!,
@@ -77,7 +74,6 @@ class _DashedCirclePainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = (size.width - strokeWidth) / 2;
 
-    // Draw dashed circle
     const dashWidth = 4.0;
     const dashSpace = 4.0;
     double startAngle = 0;

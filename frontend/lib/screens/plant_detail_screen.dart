@@ -23,22 +23,16 @@ class PlantDetailScreen extends StatefulWidget {
 }
 
 class _PlantDetailScreenState extends State<PlantDetailScreen> {
-  // Track button states
   bool _isWateredToday = false;
-  bool _hasAddedNote = false;
 
-  // Track recent activities
   List<Map<String, dynamic>> _recentActivities = [];
   
-  // Local plant state that can be updated immediately
   late Plant _currentPlant;
 
   @override
   void initState() {
     super.initState();
-    // Initialize with the plant from widget
     _currentPlant = widget.plant;
-    // Initialize with some default activities
     _recentActivities = [
       {
         'icon': Icons.calendar_today,
@@ -53,7 +47,6 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
     final prefs = await SharedPreferences.getInstance();
     final plantId = widget.plant.id;
 
-    // Load watered state
     final lastWateredDate = prefs.getString('plant_${plantId}_last_watered');
     if (lastWateredDate != null) {
       final lastWatered = DateTime.parse(lastWateredDate);
@@ -64,25 +57,6 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
       _isWateredToday = lastWateredOnly == todayOnly;
     }
 
-    // Load notes
-    final notesJson = prefs.getStringList('plant_${plantId}_notes') ?? [];
-    for (final noteJson in notesJson) {
-      try {
-        final noteData = noteJson.split('|');
-        if (noteData.length >= 2) {
-          _recentActivities.add({
-            'icon': Icons.note_add,
-            'action': 'Added growth note: ${noteData[1]}',
-            'timestamp': DateTime.parse(noteData[0]),
-          });
-          _hasAddedNote = true;
-        }
-      } catch (e) {
-        // Skip invalid note data
-      }
-    }
-
-    // Sort activities by timestamp (newest first)
     _recentActivities.sort((a, b) => (b['timestamp'] as DateTime).compareTo(a['timestamp'] as DateTime));
 
     setState(() {});
@@ -97,22 +71,6 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
     }
   }
 
-  Future<void> _saveNote(String note) async {
-    final prefs = await SharedPreferences.getInstance();
-    final plantId = widget.plant.id;
-
-    final notesJson = prefs.getStringList('plant_${plantId}_notes') ?? [];
-    final noteData = '${DateTime.now().toIso8601String()}|$note';
-    notesJson.add(noteData);
-
-    // Keep only last 10 notes to avoid storage bloat
-    if (notesJson.length > 10) {
-      notesJson.removeAt(0);
-    }
-
-    await prefs.setStringList('plant_${plantId}_notes', notesJson);
-  }
-
   void _addActivity(String action, IconData icon) {
     setState(() {
       _recentActivities.insert(0, {
@@ -120,7 +78,6 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
         'action': action,
         'timestamp': DateTime.now(),
       });
-      // Keep only last 5 activities
       if (_recentActivities.length > 5) {
         _recentActivities = _recentActivities.sublist(0, 5);
       }
@@ -133,13 +90,11 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
       backgroundColor: AppColors.getBackgroundColor(context),
       body: BlocBuilder<PlantsBloc, PlantsState>(
         builder: (context, state) {
-          // Get updated plant from state if available
           if (state is PlantsLoaded) {
             try {
               final updatedPlant = state.plants.firstWhere(
                 (p) => p.id == widget.plant.id,
               );
-              // Update local plant state with data from bloc only if it changed
               if (mounted && (_currentPlant.light != updatedPlant.light || 
                               _currentPlant.humidity != updatedPlant.humidity ||
                               _currentPlant.careTips != updatedPlant.careTips ||
@@ -152,7 +107,6 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
                 debugPrint('[PLANT_DETAIL] Updated plant data - Light: ${updatedPlant.light}, Humidity: ${updatedPlant.humidity}');
               }
             } catch (e) {
-              // Plant not found in list, keep current state
               debugPrint('[PLANT_DETAIL] Plant not found in state, using current: ${_currentPlant.name}');
             }
           }
@@ -174,8 +128,6 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
     final difference = wateringDate.difference(today).inDays;
     final isThriving = difference > 1 && difference <= 7;
     final isOverdue = difference < 0;
-    // Calculate progress: 0% when just watered, 100% when due/overdue
-    // Progress = (interval - days remaining) / interval
     final progress = difference <= 0 
         ? 1.0 
         : ((plant.wateringInterval - difference) / plant.wateringInterval).clamp(0.0, 1.0);
@@ -185,32 +137,27 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          // Background image - always use fallback
           Positioned.fill(
             child: Image.asset(
               'assets/images/people_planting.jpg',
               fit: BoxFit.cover,
             ),
           ),
-          // Dark overlay for better text readability
           Positioned.fill(
             child: Container(
               color: Colors.black.withValues(alpha: 0.3),
             ),
           ),
 
-          // Main content
           SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Header with back button and actions
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Back button
                       GestureDetector(
                         onTap: () {
                           HapticFeedback.lightImpact();
@@ -242,7 +189,6 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
                         ),
                       ),
 
-                      // Action buttons
                       Row(
                         children: [
                           _buildHeaderActionButton(
@@ -297,7 +243,6 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
 
                   const SizedBox(height: 32),
 
-                  // Plant name and status
                   Container(
                     constraints: BoxConstraints(
                       maxWidth: MediaQuery.of(context).size.width * 0.7,
@@ -324,7 +269,6 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
 
                   const SizedBox(height: 16),
 
-                  // Status badge
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     decoration: BoxDecoration(
@@ -380,33 +324,26 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
 
                   const SizedBox(height: 24),
 
-                  // Priority Alert Section - only show when overdue
                   ...(difference < 0 ? [
                     _buildPriorityAlert(context, plant, difference),
                     const SizedBox(height: 24),
                   ] : []),
 
-                  // Health Status Card
                   _buildHealthStatusCard(context, plant, difference),
                   const SizedBox(height: 24),
 
-                  // Next Watering Card
                   _buildNextWateringCard(context, plant, difference, progress),
                   const SizedBox(height: 24),
 
-                  // Care Information
                   _buildCareInformation(context, plant),
                   const SizedBox(height: 24),
 
-                  // Quick Actions
                   _buildQuickActions(context, plant),
                   const SizedBox(height: 24),
 
-                  // Growth Progress
                   _buildGrowthProgress(context),
                   const SizedBox(height: 24),
 
-                  // Recent Activities
                   _buildRecentActivities(context, plant),
                 ],
               ),
@@ -1025,10 +962,10 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
             return GridView.count(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 3,
+              crossAxisCount: 2,
               crossAxisSpacing: 12,
               mainAxisSpacing: 16,
-              childAspectRatio: 1.0,
+              childAspectRatio: 1.2,
               children: [
             _buildActionCard(
               context: context,
@@ -1091,54 +1028,6 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
                     duration: const Duration(seconds: 2),
                   ),
                 );
-              },
-            ),
-            _buildActionCard(
-              context: context,
-              icon: Icons.note_add_rounded,
-              label: 'Add Note',
-              subtitle: 'Growth updates',
-              gradient: _hasAddedNote
-                  ? const LinearGradient(
-                      colors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    )
-                  : const LinearGradient(
-                      colors: [Color(0xFF81C784), Color(0xFF66BB6A)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-              shadowColor: _hasAddedNote ? const Color(0xFFFF9800) : const Color(0xFF81C784),
-              onTap: () async {
-                HapticFeedback.mediumImpact();
-                final note = await showDialog<String>(
-                  context: context,
-                  builder: (context) => _buildAddNoteDialog(context, plant),
-                );
-                if (note != null && note.trim().isNotEmpty) {
-                  setState(() {
-                    _hasAddedNote = true;
-                  });
-                  await _saveNote(note.trim());
-                  _addActivity('Added growth note: ${note.trim()}', Icons.note_add);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Row(
-                        children: [
-                          Icon(Icons.note_add, color: Colors.white),
-                          SizedBox(width: 8),
-                          Text('Note added successfully! 📝'),
-                        ],
-                      ),
-                      backgroundColor: const Color(0xFFFF9800),
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                  );
-                }
               },
             ),
             _buildActionCard(
@@ -1312,115 +1201,6 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
             ),
           );
         }).toList(),
-      ],
-    );
-  }
-
-  Widget _buildAddNoteDialog(BuildContext context, Plant plant) {
-    final TextEditingController noteController = TextEditingController();
-
-    return AlertDialog(
-      backgroundColor: AppColors.getCardBackgroundColor(context),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
-      title: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: AppColors.primaryGreen.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              Icons.note_add,
-              color: AppColors.primaryGreen,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Text(
-            'Add Growth Note',
-            style: TextStyle(
-              color: AppColors.getTextColor(context),
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
-          ),
-        ],
-      ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Add a note about ${plant.name}\'s growth progress:',
-            style: TextStyle(
-              color: AppColors.getTextLightColor(context),
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: noteController,
-            maxLines: 3,
-            maxLength: 200,
-            decoration: InputDecoration(
-              hintText: 'e.g., New leaves growing, healthy roots...',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: AppColors.getBorderColor(context),
-                ),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: AppColors.primaryGreen,
-                  width: 2,
-                ),
-              ),
-              filled: true,
-              fillColor: AppColors.getBackgroundColor(context),
-            ),
-            style: TextStyle(
-              color: AppColors.getTextColor(context),
-            ),
-          ),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(
-            'Cancel',
-            style: TextStyle(
-              color: AppColors.getTextLightColor(context),
-            ),
-          ),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            final note = noteController.text.trim();
-            if (note.isNotEmpty) {
-              Navigator.of(context).pop(note);
-            }
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primaryGreen,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          ),
-          child: const Text(
-            'Add Note',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
       ],
     );
   }

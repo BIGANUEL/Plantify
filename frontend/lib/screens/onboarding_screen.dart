@@ -165,7 +165,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                                 title: Constants.titleThree,
                                 description: Constants.descriptionThree,
                                 imageScale: 1.6,
-                                imageHeight: 450,
+                                imageHeight: 320,
+                                imageToTitleSpacing: 40,
                                 imageColor: Colors.white,
                                 animationController: _pageAnimations[2],
                               );
@@ -249,9 +250,6 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     );
   }
 
-  //Extra Widgets
-
-  //Create the indicator decorations widget
   Widget _indicator(bool isActive) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 400),
@@ -275,7 +273,6 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     );
   }
 
-//Create the indicator list
   List<Widget> _buildIndicator() {
     List<Widget> indicators = [];
 

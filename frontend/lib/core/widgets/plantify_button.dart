@@ -71,7 +71,6 @@ class _PlantifyButtonState extends State<PlantifyButton>
     final textColor = widget.textColor ?? AppColors.backgroundWhite;
     final isEnabled = widget.onPressed != null && !widget.isLoading;
     
-    // Determine gradient colors based on button color
     List<Color> gradientColors;
     if (bgColor == AppColors.primaryGreen) {
       gradientColors = AppColors.primaryGradient;

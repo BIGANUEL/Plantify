@@ -27,8 +27,6 @@ import '../../features/explore/presentation/bloc/explore_bloc.dart';
 final sl = GetIt.instance;
 
 Future<void> init() async {
-  // Features - Auth
-  // Bloc
   sl.registerFactory(
     () => AuthBloc(
       loginUseCase: sl(),
@@ -38,12 +36,10 @@ Future<void> init() async {
     ),
   );
 
-  // Use cases
   sl.registerLazySingleton(() => LoginUseCase(sl()));
   sl.registerLazySingleton(() => RegisterUseCase(sl()));
   sl.registerLazySingleton(() => LogoutUseCase(sl()));
 
-  // Repository
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(
       remoteDataSource: sl(),
@@ -51,7 +47,6 @@ Future<void> init() async {
     ),
   );
 
-  // Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(sharedPreferences: sl()),
   );
@@ -59,8 +54,6 @@ Future<void> init() async {
     () => AuthLocalDataSourceImpl(sharedPreferences: sl()),
   );
 
-  // Features - Plants
-  // Bloc
   sl.registerFactory(
     () => PlantsBloc(
       getPlantsUseCase: sl(),
@@ -71,29 +64,24 @@ Future<void> init() async {
     ),
   );
 
-  // Use cases
   sl.registerLazySingleton(() => GetPlantsUseCase(sl()));
   sl.registerLazySingleton(() => WaterPlantUseCase(sl()));
   sl.registerLazySingleton(() => CreatePlantUseCase(sl()));
   sl.registerLazySingleton(() => UpdatePlantUseCase(sl()));
   sl.registerLazySingleton(() => DeletePlantUseCase(sl()));
 
-  // Repository
   sl.registerLazySingleton<PlantsRepository>(
     () => PlantsRepositoryImpl(
       remoteDataSource: sl(),
     ),
   );
 
-  // Data sources
   sl.registerLazySingleton<PlantsRemoteDataSource>(
     () => PlantsRemoteDataSourceImpl(
       sharedPreferences: sl(),
     ),
   );
 
-  // Features - Explore
-  // Bloc
   sl.registerFactory(
     () => ExploreBloc(
       getExplorePlantsUseCase: sl(),
@@ -101,23 +89,19 @@ Future<void> init() async {
     ),
   );
 
-  // Use cases
   sl.registerLazySingleton(() => GetExplorePlantsUseCase(sl()));
   sl.registerLazySingleton(() => GetProblemsUseCase(sl()));
 
-  // Repository
   sl.registerLazySingleton<ExploreRepository>(
     () => ExploreRepositoryImpl(
       remoteDataSource: sl(),
     ),
   );
 
-  // Data sources
   sl.registerLazySingleton<ExploreRemoteDataSource>(
     () => ExploreRemoteDataSourceImpl(),
   );
 
-  // Core
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
 }

@@ -413,7 +413,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               // Beautiful Gradient Header
               PlantifyHeader(
-                title: 'Settings',
+                title: 'Profile',
                 gradientColors: AppColors.earthGradient,
               ),
               // Profile Content

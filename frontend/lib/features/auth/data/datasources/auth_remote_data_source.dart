@@ -64,7 +64,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         final accessToken = data['accessToken'] as String;
         final refreshToken = data['refreshToken'] as String;
 
-        // Store tokens
         await sharedPreferences.setString(AppConstants.userTokenKey, accessToken);
         await sharedPreferences.setString(AppConstants.refreshTokenKey, refreshToken);
         await sharedPreferences.setString(AppConstants.userIdKey, userData['id'] as String);
@@ -151,7 +150,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         final accessToken = data['accessToken'] as String;
         final refreshToken = data['refreshToken'] as String;
 
-        // Store tokens
         await sharedPreferences.setString(AppConstants.userTokenKey, accessToken);
         await sharedPreferences.setString(AppConstants.refreshTokenKey, refreshToken);
         await sharedPreferences.setString(AppConstants.userIdKey, userData['id'] as String);
@@ -213,7 +211,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         final responseData = json.decode(response.body);
         if (responseData['success'] == true && responseData['data'] != null) {
           final newAccessToken = responseData['data']['accessToken'] as String;
-          // Store the new access token
           await sharedPreferences.setString(AppConstants.userTokenKey, newAccessToken);
           developer.log(
             'AuthRemoteDataSource: Token refreshed successfully',

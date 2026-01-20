@@ -247,7 +247,6 @@ class _AuthFormState extends State<AuthForm> with SingleTickerProviderStateMixin
           child: Column(
             key: ValueKey(isLoginMode),
             children: [
-              // Modern icon badge
               Container(
                 width: 64,
                 height: 64,
