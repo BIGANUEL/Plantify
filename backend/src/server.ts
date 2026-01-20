@@ -7,6 +7,18 @@ const startServer = async (): Promise<void> => {
     // Connect to database
     await connectDatabase();
 
+    // Auto-seed explore data if database is empty
+    const { ExploreService } = await import('./services/explore.service');
+    const exploreService = new ExploreService();
+    try {
+      await exploreService.seedExplorePlants();
+      await exploreService.seedProblems();
+      console.log('([LOG explore_seed] Explore data seeded successfully)');
+    } catch (error) {
+      console.error('([LOG explore_seed_error] Failed to seed explore data:', error);
+      // Don't fail server startup if seeding fails - it might already be seeded
+    }
+
     // Start server
     const port = env.port;
     // Bind to 0.0.0.0 to allow connections from all network interfaces
