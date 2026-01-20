@@ -2,12 +2,6 @@ import { User, IUser } from '../models/User.model';
 import { hashPassword, comparePassword } from '../utils/password.util';
 import { generateAccessToken, generateRefreshToken, verifyToken } from '../utils/jwt.util';
 import { TokenPayload, RefreshTokenPayload } from '../types/auth.types';
-import { OAuth2Client } from 'google-auth-library';
-
-const googleClient = new OAuth2Client(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET
-);
 
 export class AuthService {
   async register(email: string, password: string, name: string): Promise<{
@@ -89,72 +83,6 @@ export class AuthService {
       accessToken,
       refreshToken,
     };
-  }
-
-  async googleAuth(googleToken: string): Promise<{
-    user: IUser;
-    accessToken: string;
-    refreshToken: string;
-  }> {
-    try {
-      // Verify Google token
-      const ticket = await googleClient.verifyIdToken({
-        idToken: googleToken,
-        audience: process.env.GOOGLE_CLIENT_ID,
-      });
-
-      const payload = ticket.getPayload();
-      if (!payload) {
-        throw new Error('Invalid Google token');
-      }
-
-      const { email, name, sub: googleId } = payload;
-
-      if (!email) {
-        throw new Error('Email not provided by Google');
-      }
-
-      // Find or create user
-      let user = await User.findOne({ $or: [{ email }, { googleId }] });
-
-      if (user) {
-        // Update Google ID if not set
-        if (!user.googleId && googleId) {
-          user.googleId = googleId;
-          await user.save();
-        }
-      } else {
-        // Create new user
-        user = new User({
-          email,
-          name: name || 'User',
-          googleId,
-        });
-        await user.save();
-      }
-
-      // Generate tokens
-      const tokenPayload: TokenPayload = {
-        userId: user._id.toString(),
-        email: user.email,
-      };
-
-      const accessToken = generateAccessToken(tokenPayload);
-      const refreshToken = generateRefreshToken(tokenPayload);
-
-      // Store refresh token
-      user.refreshTokens.push(refreshToken);
-      await user.save();
-
-      return {
-        user,
-        accessToken,
-        refreshToken,
-      };
-    } catch (error) {
-      console.error('([LOG google_auth_error] ========= Google authentication error:', error);
-      throw new Error('Google authentication failed');
-    }
   }
 
   async refreshAccessToken(refreshToken: string): Promise<string> {

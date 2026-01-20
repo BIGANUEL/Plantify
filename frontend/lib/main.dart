@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:animations/animations.dart';
 import 'core/di/injection_container.dart' as di;
 import 'core/utils/dark_mode_notifier.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
@@ -11,6 +12,7 @@ import 'features/auth/presentation/pages/auth_page.dart';
 import 'features/plants/presentation/bloc/plants_bloc.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/dashboard_screen.dart';
+import 'core/constants/app_colors.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -65,37 +67,81 @@ class _PlantifyAppState extends State<PlantifyApp> {
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
               primarySwatch: Colors.green,
-              primaryColor: const Color(0xFF4CAF50), // Primary green
-              scaffoldBackgroundColor: const Color(0xFFF8FAFC), // Subtle off-white
+              primaryColor: AppColors.primaryGreen,
+              scaffoldBackgroundColor: AppColors.backgroundLightGray,
               colorScheme: ColorScheme.fromSeed(
-                seedColor: const Color(0xFF4CAF50),
+                seedColor: AppColors.primaryGreen,
                 brightness: Brightness.light,
+                primary: AppColors.primaryGreen,
+                secondary: AppColors.waterTeal,
+                tertiary: AppColors.sunAmber,
               ),
               useMaterial3: true,
-              fontFamily: 'Inter', // Will fallback to system font if not available
+              fontFamily: 'Inter',
+              pageTransitionsTheme: const PageTransitionsTheme(
+                builders: {
+                  TargetPlatform.android: SharedAxisPageTransitionsBuilder(
+                    transitionType: SharedAxisTransitionType.horizontal,
+                  ),
+                  TargetPlatform.iOS: SharedAxisPageTransitionsBuilder(
+                    transitionType: SharedAxisTransitionType.horizontal,
+                  ),
+                },
+              ),
               cardTheme: CardThemeData(
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(20),
                   side: BorderSide(color: Colors.grey.shade200, width: 1),
+                ),
+              ),
+              elevatedButtonTheme: ElevatedButtonThemeData(
+                style: ElevatedButton.styleFrom(
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
               ),
             ),
             darkTheme: ThemeData(
               primarySwatch: Colors.green,
-              primaryColor: const Color(0xFF4CAF50),
-              scaffoldBackgroundColor: const Color(0xFF121212),
+              primaryColor: AppColors.primaryGreen,
+              scaffoldBackgroundColor: AppColors.backgroundDark,
               colorScheme: ColorScheme.fromSeed(
-                seedColor: const Color(0xFF4CAF50),
+                seedColor: AppColors.primaryGreen,
                 brightness: Brightness.dark,
+                primary: AppColors.primaryGreen,
+                secondary: AppColors.waterTeal,
+                tertiary: AppColors.sunAmber,
               ),
               useMaterial3: true,
               fontFamily: 'Inter',
+              pageTransitionsTheme: const PageTransitionsTheme(
+                builders: {
+                  TargetPlatform.android: SharedAxisPageTransitionsBuilder(
+                    transitionType: SharedAxisTransitionType.horizontal,
+                  ),
+                  TargetPlatform.iOS: SharedAxisPageTransitionsBuilder(
+                    transitionType: SharedAxisTransitionType.horizontal,
+                  ),
+                },
+              ),
               cardTheme: CardThemeData(
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(20),
                   side: BorderSide(color: Colors.grey.shade800, width: 1),
+                ),
+              ),
+              elevatedButtonTheme: ElevatedButtonThemeData(
+                style: ElevatedButton.styleFrom(
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
               ),
             ),
@@ -186,9 +232,49 @@ class _AppNavigatorState extends State<AppNavigator> {
 
   Widget _buildCurrentScreen() {
     if (_appState == AppState.loading) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
+      return Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: AppColors.backgroundGradientLight,
+            ),
+          ),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: AppColors.primaryGradient,
+                    ),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryGreen.withValues(alpha: 0.3),
+                        blurRadius: 20,
+                        spreadRadius: 5,
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.eco_rounded,
+                    color: Colors.white,
+                    size: 40,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
+                  strokeWidth: 3,
+                ),
+              ],
+            ),
+          ),
         ),
       );
     }

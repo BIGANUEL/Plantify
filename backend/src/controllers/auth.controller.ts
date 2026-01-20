@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthService } from '../services/auth.service';
 import { AuthRequest } from '../middleware/auth.middleware';
-import { RegisterRequest, LoginRequest, GoogleAuthRequest, RefreshTokenRequest } from '../types/auth.types';
+import { RegisterRequest, LoginRequest, RefreshTokenRequest } from '../types/auth.types';
 
 const authService = new AuthService();
 
@@ -58,51 +58,6 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
     });
   } catch (error: any) {
     if (error.message === 'Invalid credentials') {
-      res.status(401).json({
-        success: false,
-        error: {
-          message: error.message,
-          code: 'UNAUTHORIZED',
-        },
-      });
-      return;
-    }
-    next(error);
-  }
-};
-
-export const googleAuth = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const { token }: GoogleAuthRequest = req.body;
-
-    if (!token) {
-      res.status(400).json({
-        success: false,
-        error: {
-          message: 'Google token is required',
-          code: 'VALIDATION_ERROR',
-        },
-      });
-      return;
-    }
-
-    const result = await authService.googleAuth(token);
-
-    res.status(200).json({
-      success: true,
-      data: {
-        user: {
-          id: result.user._id.toString(),
-          email: result.user.email,
-          name: result.user.name,
-          googleId: result.user.googleId,
-        },
-        accessToken: result.accessToken,
-        refreshToken: result.refreshToken,
-      },
-    });
-  } catch (error: any) {
-    if (error.message === 'Google authentication failed' || error.message === 'Invalid Google token') {
       res.status(401).json({
         success: false,
         error: {

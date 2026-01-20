@@ -1,14 +1,18 @@
 /// Application-wide constants
 class AppConstants {
   // API endpoints
-  static const String baseUrl = 'https://api.example.com';
-  static const String apiVersion = 'v1';
+  // TODO: Replace with your actual deployed backend URL
+  // For development: 'http://localhost:5001'
+  // For production: 'https://your-app-name.onrender.com' (or your deployment URL)
+  static const String baseUrl = 'https://plantify-2-fre0.onrender.com';
+  static const String apiPrefix = '/api'; // Backend uses /api prefix
   static const int connectTimeout = 30000; // milliseconds
   static const int receiveTimeout = 30000; // milliseconds
 
   // Storage keys
   static const String onboardingCompletedKey = 'onboarding_completed';
-  static const String userTokenKey = 'user_token';
+  static const String userTokenKey = 'access_token'; // Backend returns 'accessToken'
+  static const String refreshTokenKey = 'refresh_token';
   static const String userIdKey = 'user_id';
   static const String userEmailKey = 'user_email';
   static const String themeModeKey = 'theme_mode';

@@ -25,7 +25,6 @@ export class PlantsService {
       type: plantData.type,
       careInstructions: plantData.careInstructions,
       wateringFrequency: plantData.wateringFrequency || 7,
-      imageUrl: plantData.imageUrl,
       light: plantData.light,
       humidity: plantData.humidity,
     });
@@ -67,7 +66,6 @@ export class PlantsService {
     if (plantData.wateringFrequency !== undefined) {
       plant.wateringFrequency = plantData.wateringFrequency;
     }
-    if (plantData.imageUrl !== undefined) plant.imageUrl = plantData.imageUrl;
     if (plantData.light !== undefined) plant.light = plantData.light;
     if (plantData.humidity !== undefined) plant.humidity = plantData.humidity;
 

@@ -5,7 +5,6 @@ class Plant extends Equatable {
   final String name;
   final String type;
   final DateTime nextWateringDate;
-  final String? photo;
   final int wateringInterval; // in days
   final DateTime? lastWateredDate;
   final String? light;
@@ -17,7 +16,6 @@ class Plant extends Equatable {
     required this.name,
     required this.type,
     required this.nextWateringDate,
-    this.photo,
     this.wateringInterval = 7,
     this.lastWateredDate,
     this.light,
@@ -31,7 +29,6 @@ class Plant extends Equatable {
         name,
         type,
         nextWateringDate,
-        photo,
         wateringInterval,
         lastWateredDate,
         light,

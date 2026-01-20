@@ -411,9 +411,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           backgroundColor: AppColors.getBackgroundColor(context),
           body: Column(
             children: [
-              // Green Header
-              const PlantifyHeader(
+              // Beautiful Gradient Header
+              PlantifyHeader(
                 title: 'Settings',
+                gradientColors: AppColors.earthGradient,
               ),
               // Profile Content
               Expanded(
@@ -712,7 +713,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Switch(
               value: value,
               onChanged: onChanged,
-              activeColor: AppColors.primaryGreen,
+              activeTrackColor: AppColors.primaryGreen.withValues(alpha: 0.5),
+              thumbColor: WidgetStateProperty.resolveWith<Color>(
+                (Set<WidgetState> states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return AppColors.primaryGreen;
+                  }
+                  return Colors.grey;
+                },
+              ),
             ),
           ],
         ),

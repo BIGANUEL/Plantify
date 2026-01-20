@@ -7,7 +7,6 @@ import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/domain/usecases/login_usecase.dart';
 import '../../features/auth/domain/usecases/register_usecase.dart';
 import '../../features/auth/domain/usecases/logout_usecase.dart';
-import '../../features/auth/domain/usecases/google_signin_usecase.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/plants/data/datasources/plants_remote_data_source.dart';
 import '../../features/plants/data/repositories/plants_repository_impl.dart';
@@ -16,7 +15,14 @@ import '../../features/plants/domain/usecases/get_plants_usecase.dart';
 import '../../features/plants/domain/usecases/water_plant_usecase.dart';
 import '../../features/plants/domain/usecases/create_plant_usecase.dart';
 import '../../features/plants/domain/usecases/update_plant_usecase.dart';
+import '../../features/plants/domain/usecases/delete_plant_usecase.dart';
 import '../../features/plants/presentation/bloc/plants_bloc.dart';
+import '../../features/explore/data/datasources/explore_remote_data_source.dart';
+import '../../features/explore/data/repositories/explore_repository_impl.dart';
+import '../../features/explore/domain/repositories/explore_repository.dart';
+import '../../features/explore/domain/usecases/get_explore_plants_usecase.dart';
+import '../../features/explore/domain/usecases/get_problems_usecase.dart';
+import '../../features/explore/presentation/bloc/explore_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -28,7 +34,6 @@ Future<void> init() async {
       loginUseCase: sl(),
       registerUseCase: sl(),
       logoutUseCase: sl(),
-      googleSignInUseCase: sl(),
       authRepository: sl(),
     ),
   );
@@ -37,7 +42,6 @@ Future<void> init() async {
   sl.registerLazySingleton(() => LoginUseCase(sl()));
   sl.registerLazySingleton(() => RegisterUseCase(sl()));
   sl.registerLazySingleton(() => LogoutUseCase(sl()));
-  sl.registerLazySingleton(() => GoogleSignInUseCase(sl()));
 
   // Repository
   sl.registerLazySingleton<AuthRepository>(
@@ -49,7 +53,7 @@ Future<void> init() async {
 
   // Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(),
+    () => AuthRemoteDataSourceImpl(sharedPreferences: sl()),
   );
   sl.registerLazySingleton<AuthLocalDataSource>(
     () => AuthLocalDataSourceImpl(sharedPreferences: sl()),
@@ -63,6 +67,7 @@ Future<void> init() async {
       waterPlantUseCase: sl(),
       createPlantUseCase: sl(),
       updatePlantUseCase: sl(),
+      deletePlantUseCase: sl(),
     ),
   );
 
@@ -71,6 +76,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => WaterPlantUseCase(sl()));
   sl.registerLazySingleton(() => CreatePlantUseCase(sl()));
   sl.registerLazySingleton(() => UpdatePlantUseCase(sl()));
+  sl.registerLazySingleton(() => DeletePlantUseCase(sl()));
 
   // Repository
   sl.registerLazySingleton<PlantsRepository>(
@@ -84,6 +90,31 @@ Future<void> init() async {
     () => PlantsRemoteDataSourceImpl(
       sharedPreferences: sl(),
     ),
+  );
+
+  // Features - Explore
+  // Bloc
+  sl.registerFactory(
+    () => ExploreBloc(
+      getExplorePlantsUseCase: sl(),
+      getProblemsUseCase: sl(),
+    ),
+  );
+
+  // Use cases
+  sl.registerLazySingleton(() => GetExplorePlantsUseCase(sl()));
+  sl.registerLazySingleton(() => GetProblemsUseCase(sl()));
+
+  // Repository
+  sl.registerLazySingleton<ExploreRepository>(
+    () => ExploreRepositoryImpl(
+      remoteDataSource: sl(),
+    ),
+  );
+
+  // Data sources
+  sl.registerLazySingleton<ExploreRemoteDataSource>(
+    () => ExploreRemoteDataSourceImpl(),
   );
 
   // Core

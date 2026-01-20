@@ -9,10 +9,6 @@ export interface LoginRequest {
   password: string;
 }
 
-export interface GoogleAuthRequest {
-  token: string;
-}
-
 export interface RefreshTokenRequest {
   refreshToken: string;
 }
@@ -22,7 +18,6 @@ export interface AuthResponse {
     id: string;
     email: string;
     name: string;
-    googleId?: string;
   };
   accessToken: string;
   refreshToken: string;

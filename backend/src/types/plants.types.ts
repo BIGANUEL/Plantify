@@ -3,7 +3,6 @@ export interface CreatePlantRequest {
   type: string;
   careInstructions?: string;
   wateringFrequency?: number;
-  imageUrl?: string;
   light?: string;
   humidity?: string;
   nextWatering?: string; // ISO 8601 date string
@@ -14,7 +13,6 @@ export interface UpdatePlantRequest {
   type?: string;
   careInstructions?: string;
   wateringFrequency?: number;
-  imageUrl?: string;
   light?: string;
   humidity?: string;
 }
@@ -27,7 +25,6 @@ export interface PlantResponse {
   wateringFrequency: number;
   lastWatered?: Date;
   nextWatering?: Date;
-  imageUrl?: string;
   light?: string;
   humidity?: string;
   createdAt: Date;

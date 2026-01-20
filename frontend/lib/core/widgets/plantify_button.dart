@@ -69,26 +69,52 @@ class _PlantifyButtonState extends State<PlantifyButton>
   Widget build(BuildContext context) {
     final bgColor = widget.backgroundColor ?? AppColors.primaryGreen;
     final textColor = widget.textColor ?? AppColors.backgroundWhite;
+    final isEnabled = widget.onPressed != null && !widget.isLoading;
+    
+    // Determine gradient colors based on button color
+    List<Color> gradientColors;
+    if (bgColor == AppColors.primaryGreen) {
+      gradientColors = AppColors.primaryGradient;
+    } else if (bgColor == AppColors.waterTeal) {
+      gradientColors = AppColors.oceanGradient;
+    } else if (bgColor == AppColors.sunAmber) {
+      gradientColors = AppColors.sunsetGradient;
+    } else if (bgColor == AppColors.earthBrown) {
+      gradientColors = AppColors.earthGradient;
+    } else {
+      gradientColors = [
+        bgColor,
+        bgColor.withValues(alpha: 0.8),
+      ];
+    }
 
     return GestureDetector(
-      onTapDown: widget.onPressed != null ? _handleTapDown : null,
-      onTapUp: widget.onPressed != null ? _handleTapUp : null,
-      onTapCancel: widget.onPressed != null ? _handleTapCancel : null,
+      onTapDown: isEnabled ? _handleTapDown : null,
+      onTapUp: isEnabled ? _handleTapUp : null,
+      onTapCancel: isEnabled ? _handleTapCancel : null,
       onTap: widget.isLoading ? null : widget.onPressed,
       child: ScaleTransition(
         scale: _scaleAnimation,
-        child: Container(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
           height: widget.height ?? 56,
           decoration: BoxDecoration(
-            color: widget.onPressed != null ? bgColor : AppColors.borderLight,
+            gradient: isEnabled
+                ? LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: gradientColors,
+                  )
+                : null,
+            color: isEnabled ? null : AppColors.borderLight,
             borderRadius: BorderRadius.circular(widget.borderRadius ?? 16),
-            boxShadow: widget.onPressed != null
+            boxShadow: isEnabled
                 ? [
                     BoxShadow(
-                      color: bgColor.withValues(alpha: 0.3),
-                      blurRadius: 12,
+                      color: gradientColors.first.withValues(alpha: 0.4),
+                      blurRadius: _controller.isAnimating ? 8 : 20,
                       spreadRadius: 0,
-                      offset: const Offset(0, 6),
+                      offset: Offset(0, _controller.isAnimating ? 4 : 8),
                     ),
                   ]
                 : null,
@@ -111,17 +137,24 @@ class _PlantifyButtonState extends State<PlantifyButton>
                         Icon(
                           widget.icon,
                           color: textColor,
-                          size: 20,
+                          size: 22,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 10),
                       ],
                       Text(
                         widget.text,
                         style: TextStyle(
                           color: textColor,
                           fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.3,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black.withValues(alpha: 0.2),
+                              blurRadius: 2,
+                              offset: const Offset(0, 1),
+                            ),
+                          ],
                         ),
                       ),
                     ],

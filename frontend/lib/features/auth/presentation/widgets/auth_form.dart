@@ -6,7 +6,6 @@ import '../bloc/auth_state.dart';
 import '../../../../core/widgets/plantify_text_field.dart';
 import '../../../../core/widgets/plantify_button.dart';
 import '../../../../core/constants/app_colors.dart';
-import 'google_sign_in_button.dart';
 
 class AuthForm extends StatefulWidget {
   const AuthForm({super.key});
@@ -218,15 +217,6 @@ class _AuthFormState extends State<AuthForm> with SingleTickerProviderStateMixin
                     text: isLoginMode ? 'Sign In' : 'Sign Up',
                   ),
                   const SizedBox(height: 20),
-                  _buildDivider(),
-                  const SizedBox(height: 20),
-                  GoogleSignInButton(
-                    onPressed: isLoading ? null : () {
-                      context.read<AuthBloc>().add(const GoogleSignInRequested());
-                    },
-                    isLoading: isLoading,
-                  ),
-                  const SizedBox(height: 20),
                   _buildToggleButton(isLoginMode),
                 ],
               ),
@@ -331,52 +321,6 @@ class _AuthFormState extends State<AuthForm> with SingleTickerProviderStateMixin
     );
   }
 
-  Widget _buildDivider() {
-    return Row(
-      children: [
-        Expanded(
-          child: Container(
-            height: 1,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.transparent,
-                  Colors.grey[300]!,
-                  Colors.transparent,
-                ],
-              ),
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            'OR',
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 1,
-            ),
-          ),
-        ),
-        Expanded(
-          child: Container(
-            height: 1,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.transparent,
-                  Colors.grey[300]!,
-                  Colors.transparent,
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _buildToggleButton(bool isLoginMode) {
     return Row(

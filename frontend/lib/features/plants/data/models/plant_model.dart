@@ -6,7 +6,6 @@ class PlantModel extends Plant {
     required super.name,
     required super.type,
     required super.nextWateringDate,
-    super.photo,
     super.wateringInterval,
     super.lastWateredDate,
     super.light,
@@ -47,13 +46,16 @@ class PlantModel extends Plant {
       id: json['id'] as String,
       name: json['name'] as String,
       type: json['type'] as String,
-      nextWateringDate: parseDate(json['nextWateringDate']),
-      photo: json['photo'] as String?,
-      wateringInterval: json['wateringInterval'] as int? ?? 7,
-      lastWateredDate: parseNullableDate(json['lastWateredDate']),
+      // Backend uses 'nextWatering' but model expects 'nextWateringDate'
+      nextWateringDate: parseDate(json['nextWatering'] ?? json['nextWateringDate']),
+      // Backend uses 'wateringFrequency' but model expects 'wateringInterval'
+      wateringInterval: (json['wateringFrequency'] as int?) ?? (json['wateringInterval'] as int?) ?? 7,
+      // Backend uses 'lastWatered' but model expects 'lastWateredDate'
+      lastWateredDate: parseNullableDate(json['lastWatered'] ?? json['lastWateredDate']),
       light: json['light'] as String?,
       humidity: json['humidity'] as String?,
-      careTips: json['careTips'] as String?,
+      // Backend uses 'careInstructions' but model expects 'careTips'
+      careTips: json['careInstructions'] as String? ?? json['careTips'] as String?,
     );
   }
 
@@ -63,7 +65,6 @@ class PlantModel extends Plant {
       'name': name,
       'type': type,
       'nextWateringDate': nextWateringDate.toIso8601String(),
-      if (photo != null) 'photo': photo,
       'wateringInterval': wateringInterval,
       if (lastWateredDate != null)
         'lastWateredDate': lastWateredDate!.toIso8601String(),

@@ -10,6 +10,7 @@ class PlantifyTextField extends StatefulWidget {
   final Widget? suffixIcon;
   final String? Function(String?)? validator;
   final String? hintText;
+  final int? maxLines;
 
   const PlantifyTextField({
     super.key,
@@ -21,6 +22,7 @@ class PlantifyTextField extends StatefulWidget {
     this.suffixIcon,
     this.validator,
     this.hintText,
+    this.maxLines,
   });
 
   @override
@@ -79,6 +81,7 @@ class _PlantifyTextFieldState extends State<PlantifyTextField>
         focusNode: _focusNode,
         obscureText: widget.obscureText,
         keyboardType: widget.keyboardType,
+        maxLines: widget.maxLines ?? 1,
         validator: widget.validator,
         style: TextStyle(
           fontSize: 16,

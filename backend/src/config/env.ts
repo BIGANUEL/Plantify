@@ -9,8 +9,6 @@ export const env = {
   jwtSecret: process.env.JWT_SECRET || 'default-secret-change-in-production',
   jwtAccessExpiry: process.env.JWT_ACCESS_EXPIRY || '15m',
   jwtRefreshExpiry: process.env.JWT_REFRESH_EXPIRY || '7d',
-  googleClientId: process.env.GOOGLE_CLIENT_ID || '',
-  googleClientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
   corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:3000',
 };
 

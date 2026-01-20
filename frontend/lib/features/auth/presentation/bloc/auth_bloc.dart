@@ -1,9 +1,9 @@
+import 'dart:developer' as developer;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../../domain/usecases/login_usecase.dart';
 import '../../domain/usecases/register_usecase.dart';
 import '../../domain/usecases/logout_usecase.dart';
-import '../../domain/usecases/google_signin_usecase.dart';
 import '../../domain/repositories/auth_repository.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
@@ -12,14 +12,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginUseCase loginUseCase;
   final RegisterUseCase registerUseCase;
   final LogoutUseCase logoutUseCase;
-  final GoogleSignInUseCase googleSignInUseCase;
   final AuthRepository authRepository;
 
   AuthBloc({
     required this.loginUseCase,
     required this.registerUseCase,
     required this.logoutUseCase,
-    required this.googleSignInUseCase,
     required this.authRepository,
   }) : super(const AuthUnauthenticated(isLoginMode: true)) {
     on<AuthInitialized>(_onAuthInitialized);
@@ -27,7 +25,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<RegisterRequested>(_onRegisterRequested);
     on<AuthModeToggled>(_onAuthModeToggled);
     on<LogoutRequested>(_onLogoutRequested);
-    on<GoogleSignInRequested>(_onGoogleSignInRequested);
   }
 
   Future<void> _onAuthInitialized(
@@ -60,10 +57,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       ),
     );
     result.fold(
-      (failure) => emit(AuthError(
-        message: failure.message,
-        isLoginMode: true,
-      )),
+      (failure) {
+        developer.log(
+          'AuthBloc: Login failed',
+          name: 'AuthBloc',
+          error: failure,
+        );
+        emit(AuthError(
+          message: failure.message,
+          isLoginMode: true,
+        ));
+      },
       (user) => emit(AuthAuthenticated(user)),
     );
   }
@@ -81,10 +85,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       ),
     );
     result.fold(
-      (failure) => emit(AuthError(
-        message: failure.message,
-        isLoginMode: false,
-      )),
+      (failure) {
+        developer.log(
+          'AuthBloc: Registration failed',
+          name: 'AuthBloc',
+          error: failure,
+        );
+        emit(AuthError(
+          message: failure.message,
+          isLoginMode: false,
+        ));
+      },
       (user) => emit(AuthAuthenticated(user)),
     );
   }
@@ -118,21 +129,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         isLoginMode: true,
       )),
       (_) => emit(const AuthUnauthenticated(isLoginMode: true)),
-    );
-  }
-
-  Future<void> _onGoogleSignInRequested(
-    GoogleSignInRequested event,
-    Emitter<AuthState> emit,
-  ) async {
-    emit(const AuthLoading());
-    final result = await googleSignInUseCase(const NoParams());
-    result.fold(
-      (failure) => emit(AuthError(
-        message: failure.message,
-        isLoginMode: true,
-      )),
-      (user) => emit(AuthAuthenticated(user)),
     );
   }
 }

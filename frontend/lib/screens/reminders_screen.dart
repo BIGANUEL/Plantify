@@ -97,10 +97,11 @@ class RemindersScreen extends StatelessWidget {
 
           return CustomScrollView(
             slivers: [
-              // Green Header (no subtitle)
+              // Beautiful Gradient Header
               SliverToBoxAdapter(
-                child: const PlantifyHeader(
+                child: PlantifyHeader(
                   title: 'Reminders',
+                  gradientColors: AppColors.sunsetGradient,
                 ),
               ),
               if (reminders.isEmpty)

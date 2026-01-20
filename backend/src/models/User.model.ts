@@ -2,9 +2,8 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IUser extends Document {
   email: string;
-  password?: string;
+  password: string;
   name: string;
-  googleId?: string;
   refreshTokens: string[];
   createdAt: Date;
   updatedAt: Date;
@@ -21,19 +20,12 @@ const UserSchema = new Schema<IUser>(
     },
     password: {
       type: String,
-      required: function (this: IUser) {
-        return !this.googleId;
-      },
+      required: true,
     },
     name: {
       type: String,
       required: true,
       trim: true,
-    },
-    googleId: {
-      type: String,
-      unique: true,
-      sparse: true,
     },
     refreshTokens: {
       type: [String],
@@ -45,7 +37,7 @@ const UserSchema = new Schema<IUser>(
   }
 );
 
-// Note: email and googleId already have indexes from unique: true
+// Note: email already has an index from unique: true
 // Additional indexes can be added here if needed for compound queries
 
 export const User = mongoose.model<IUser>('User', UserSchema);

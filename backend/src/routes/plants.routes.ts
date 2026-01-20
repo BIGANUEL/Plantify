@@ -126,10 +126,6 @@ router.get('/:id', getPlantById as any);
  *                 type: number
  *                 minimum: 1
  *                 example: 7
- *               imageUrl:
- *                 type: string
- *                 format: uri
- *                 example: https://example.com/image.jpg
  *     responses:
  *       201:
  *         description: Plant created successfully
@@ -165,7 +161,6 @@ router.post(
     body('type').trim().notEmpty().withMessage('Plant type is required'),
     body('careInstructions').optional().trim(),
     body('wateringFrequency').optional().isInt({ min: 1 }).withMessage('Watering frequency must be a positive number'),
-    body('imageUrl').optional().isURL().withMessage('Image URL must be a valid URL'),
     body('nextWatering').optional().isISO8601().withMessage('Next watering date must be a valid ISO 8601 date'),
   ],
   validateRequest,
@@ -206,10 +201,6 @@ router.post(
  *                 type: number
  *                 minimum: 1
  *                 example: 5
- *               imageUrl:
- *                 type: string
- *                 format: uri
- *                 example: https://example.com/new-image.jpg
  *     responses:
  *       200:
  *         description: Plant updated successfully
@@ -245,7 +236,6 @@ router.put(
     body('type').optional().trim().notEmpty().withMessage('Plant type cannot be empty'),
     body('careInstructions').optional().trim(),
     body('wateringFrequency').optional().isInt({ min: 1 }).withMessage('Watering frequency must be a positive number'),
-    body('imageUrl').optional().isURL().withMessage('Image URL must be a valid URL'),
   ],
   validateRequest,
   updatePlant as any

@@ -4,7 +4,6 @@ import { validateRequest } from '../utils/validation.util';
 import {
   register,
   login,
-  googleAuth,
   refreshToken,
   getCurrentUser,
   logout,
@@ -157,59 +156,6 @@ router.post(
   ],
   validateRequest,
   login
-);
-
-/**
- * @swagger
- * /api/auth/google:
- *   post:
- *     summary: Authenticate with Google OAuth
- *     tags: [Authentication]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - token
- *             properties:
- *               token:
- *                 type: string
- *                 description: Google OAuth token from mobile app
- *                 example: google_oauth_token_here
- *     responses:
- *       200:
- *         description: Authentication successful
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 data:
- *                   type: object
- *                   properties:
- *                     user:
- *                       $ref: '#/components/schemas/User'
- *                     accessToken:
- *                       type: string
- *                     refreshToken:
- *                       type: string
- *       401:
- *         description: Invalid Google token
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- */
-router.post(
-  '/google',
-  authRateLimiter,
-  [body('token').notEmpty().withMessage('Google token is required')],
-  validateRequest,
-  googleAuth
 );
 
 /**

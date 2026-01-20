@@ -69,6 +69,43 @@ class AppColors {
   // Card colors - Dark mode
   static const Color cardBackgroundDark = Color(0xFF2D2D2D);
   
+  // Gradient colors for beautiful backgrounds
+  static List<Color> get primaryGradient => [
+    primaryGreen,
+    primaryGreenLight,
+    waterTeal,
+  ];
+  
+  static List<Color> get sunsetGradient => [
+    sunAmber,
+    sunAmberLight,
+    const Color(0xFFFF6B6B),
+  ];
+  
+  static List<Color> get oceanGradient => [
+    waterTeal,
+    waterTealLight,
+    const Color(0xFF3B82F6),
+  ];
+  
+  static List<Color> get earthGradient => [
+    earthBrown,
+    earthBrownLight,
+    primaryGreen,
+  ];
+  
+  static List<Color> get backgroundGradientLight => [
+    const Color(0xFFF0FDF4), // Very light green
+    const Color(0xFFF8FAFC), // Off white
+    const Color(0xFFECFDF5), // Mint tint
+  ];
+  
+  static List<Color> get backgroundGradientDark => [
+    const Color(0xFF0A1F0A), // Very dark green
+    const Color(0xFF121212), // Dark gray
+    const Color(0xFF1A2E1A), // Dark green tint
+  ];
+
   // Helper methods to get theme-aware colors
   static Color getBackgroundColor(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark

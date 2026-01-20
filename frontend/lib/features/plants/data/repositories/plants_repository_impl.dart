@@ -41,9 +41,25 @@ class PlantsRepositoryImpl implements PlantsRepository {
   }
 
   @override
-  Future<Result<Plant>> createPlant(String name, String type, DateTime nextWateringDate) async {
+  Future<Result<Plant>> createPlant(
+    String name,
+    String type,
+    DateTime nextWateringDate, {
+    int wateringInterval = 7,
+    String? light,
+    String? humidity,
+    String? careTips,
+  }) async {
     try {
-      final plant = await remoteDataSource.createPlant(name, type, nextWateringDate);
+      final plant = await remoteDataSource.createPlant(
+        name,
+        type,
+        nextWateringDate,
+        wateringInterval: wateringInterval,
+        light: light,
+        humidity: humidity,
+        careTips: careTips,
+      );
       return Result.success(plant);
     } on ServerException catch (e) {
       return Result.failure(ServerFailure(e.message));
@@ -75,6 +91,20 @@ class PlantsRepositoryImpl implements PlantsRepository {
         careTips,
       );
       return Result.success(plant);
+    } on ServerException catch (e) {
+      return Result.failure(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      return Result.failure(NetworkFailure(e.message));
+    } catch (e) {
+      return Result.failure(UnknownFailure('An unexpected error occurred: ${e.toString()}'));
+    }
+  }
+
+  @override
+  Future<Result<void>> deletePlant(String plantId) async {
+    try {
+      await remoteDataSource.deletePlant(plantId);
+      return Result.success(null);
     } on ServerException catch (e) {
       return Result.failure(ServerFailure(e.message));
     } on NetworkException catch (e) {

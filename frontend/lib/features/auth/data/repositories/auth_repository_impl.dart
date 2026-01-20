@@ -54,25 +54,6 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Result<User>> signInWithGoogle() async {
-    try {
-      final userModel = await remoteDataSource.signInWithGoogle();
-      await localDataSource.cacheUser(userModel);
-      return Result.success(userModel);
-    } on ValidationException catch (e) {
-      return Result.failure(ValidationFailure(e.message));
-    } on ServerException catch (e) {
-      return Result.failure(ServerFailure(e.message));
-    } on NetworkException catch (e) {
-      return Result.failure(NetworkFailure(e.message));
-    } on CacheException catch (e) {
-      return Result.failure(CacheFailure(e.message));
-    } catch (e) {
-      return Result.failure(UnknownFailure('An unexpected error occurred: ${e.toString()}'));
-    }
-  }
-
-  @override
   Future<Result<void>> logout() async {
     try {
       await localDataSource.clearCache();
@@ -91,6 +72,20 @@ class AuthRepositoryImpl implements AuthRepository {
       return Result.success(userModel);
     } on CacheException catch (e) {
       return Result.failure(CacheFailure(e.message));
+    } catch (e) {
+      return Result.failure(UnknownFailure('An unexpected error occurred: ${e.toString()}'));
+    }
+  }
+
+  @override
+  Future<Result<bool>> refreshAccessToken() async {
+    try {
+      final success = await remoteDataSource.refreshAccessToken();
+      return Result.success(success);
+    } on NetworkException catch (e) {
+      return Result.failure(NetworkFailure(e.message));
+    } on ServerException catch (e) {
+      return Result.failure(ServerFailure(e.message));
     } catch (e) {
       return Result.failure(UnknownFailure('An unexpected error occurred: ${e.toString()}'));
     }

@@ -28,15 +28,23 @@ class PlantCreated extends PlantsEvent {
   final String name;
   final String type;
   final DateTime nextWateringDate;
+  final int wateringInterval;
+  final String? light;
+  final String? humidity;
+  final String? careTips;
 
   const PlantCreated({
     required this.name,
     required this.type,
     required this.nextWateringDate,
+    this.wateringInterval = 7,
+    this.light,
+    this.humidity,
+    this.careTips,
   });
 
   @override
-  List<Object?> get props => [name, type, nextWateringDate];
+  List<Object?> get props => [name, type, nextWateringDate, wateringInterval, light, humidity, careTips];
 }
 
 class PlantUpdated extends PlantsEvent {
@@ -60,5 +68,14 @@ class PlantUpdated extends PlantsEvent {
 
   @override
   List<Object?> get props => [id, name, type, wateringInterval, light, humidity, careTips];
+}
+
+class PlantDeleted extends PlantsEvent {
+  final String plantId;
+
+  const PlantDeleted({required this.plantId});
+
+  @override
+  List<Object?> get props => [plantId];
 }
 

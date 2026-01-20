@@ -81,10 +81,6 @@ const options: swaggerJsdoc.Options = {
               type: 'string',
               description: 'User name',
             },
-            googleId: {
-              type: 'string',
-              description: 'Google OAuth ID (if authenticated via Google)',
-            },
             createdAt: {
               type: 'string',
               format: 'date-time',
@@ -122,11 +118,6 @@ const options: swaggerJsdoc.Options = {
             nextWatering: {
               type: 'string',
               format: 'date-time',
-              nullable: true,
-            },
-            imageUrl: {
-              type: 'string',
-              format: 'uri',
               nullable: true,
             },
             createdAt: {
